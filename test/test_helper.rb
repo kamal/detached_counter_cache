@@ -22,6 +22,11 @@ ActiveRecord::Schema.define do
   
   create_table "globes", :force => true do |t|
     t.integer  "user_id"
+    t.integer  'latitudes_count'
+  end
+  
+  create_table "latitudes", :force => true do |t|
+    t.integer  'globe_id'
   end
   
   create_table "users_wristbands_counts", :force => true do |t|
@@ -58,6 +63,11 @@ end
 
 class Globe < ActiveRecord::Base
   belongs_to :user, :counter_cache => true
+  has_many :latitudes
+end
+
+class Latitude < ActiveRecord::Base
+  belongs_to :globe, :counter_cache => true
 end
 
 class UsersWristbandsCount < ActiveRecord::Base

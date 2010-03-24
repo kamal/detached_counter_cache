@@ -63,4 +63,11 @@ class DetachedCounterCacheTest < ActiveSupport::TestCase
     assert_equal 1, user.reload.globes.size
   end
   
+  def test_ordinary_counter_cache_with_owner_having_no_detached_counter_caches
+    globe = Globe.create
+    globe.latitudes.create
+    assert_equal 1, globe.reload.latitudes_count
+    assert_equal 1, globe.reload.latitudes.size
+  end
+  
 end
