@@ -6,18 +6,19 @@ module ActiveRecordExtensions
         base.send(:class_inheritable_accessor, :detached_counter_cache_table_names)
         class <<base
           alias_method_chain :update_counters, :detached_counters
+          alias_method_chain :belongs_to, :detached_counters
         end
       end
       
       module ClassMethods
-        def belongs_to(association_id, options = {})
+        def belongs_to_with_detached_counters(association_id, options = {})
           add_detached_counter_cache = options.delete(:detached_counter_cache)
           if add_detached_counter_cache
             placeholder = DetachedCounterCachePlaceholder.new
             options[:counter_cache] = placeholder
           end
           
-          super(association_id, options)
+          belongs_to_without_detached_counters(association_id, options)
           
           if add_detached_counter_cache
             reflection = reflections[association_id]
