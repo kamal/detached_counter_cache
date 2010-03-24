@@ -70,4 +70,7 @@ class DetachedCounterCacheTest < ActiveSupport::TestCase
     assert_equal 1, globe.reload.latitudes.size
   end
   
+  def test_has_many_size_with_no_count_record
+    User.create.wristbands.size
+  end
 end

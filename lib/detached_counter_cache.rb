@@ -61,7 +61,8 @@ module ActiveRecordExtensions
           potential_table_name = [@owner.class.table_name, @reflection.klass.table_name, 'counts'].join('_')
           
           if (@owner.class.detached_counter_cache_table_names || []).include?(potential_table_name)
-            connection.select_all("select count from `#{potential_table_name}` where #{@reflection.primary_key_name} = #{@owner.id}")[0]['count'].to_i
+            row = connection.select_all("select count from `#{potential_table_name}` where #{@reflection.primary_key_name} = #{@owner.id}")[0]
+            row.blank? ? 0 : row['count'].to_i
           else
             count_records_without_detached_counters
           end
