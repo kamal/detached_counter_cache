@@ -1,0 +1,6 @@
+detached_counter_cache_test:
+  adapter: mysql
+  host: localhost
+  database: detached_counter_cache_test
+  username: andrew
+  password:
