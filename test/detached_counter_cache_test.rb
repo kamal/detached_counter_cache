@@ -60,6 +60,7 @@ class DetachedCounterCacheTest < ActiveSupport::TestCase
     user = User.create
     user.globes.create
     assert_equal 1, user.reload.globes_count
+    assert_equal 1, user.reload.globes.size
   end
   
 end
