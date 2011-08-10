@@ -35,9 +35,12 @@ module ActiveRecordExtensions
           end
 
           detached_counters.each do |placeholder, value|
+            # http://stackoverflow.com/questions/1109061/insert-on-duplicate-update-postgresql/6527838#6527838
             self.connection.execute(<<-SQL
-              INSERT INTO `#{placeholder.detached_counter_table_name}` (#{placeholder.reflection.primary_key_name}, count) VALUES (#{id}, #{value})
-              ON DUPLICATE KEY UPDATE count = count + #{value}
+              UPDATE #{placeholder.detached_counter_table_name} SET count = count + #{value} WHERE #{placeholder.reflection.primary_key_name} = #{id};
+              INSERT INTO #{placeholder.detached_counter_table_name} (#{placeholder.reflection.primary_key_name}, count)
+              SELECT #{id}, #{value}
+              WHERE 1 NOT IN (SELECT 1 FROM #{placeholder.detached_counter_table_name} WHERE #{placeholder.reflection.primary_key_name} = #{id});
             SQL
             )
           end
@@ -51,15 +54,15 @@ module ActiveRecordExtensions
       extend ActiveSupport::Concern
 
       included do
-        alias_method_chain :count_records, :detached_counters
+        alias_method_chain :count_records, :detached_counters # for some odd reason, plain ol super doesn't work here
       end
 
       module InstanceMethods
         def count_records_with_detached_counters
           potential_table_name = [@owner.class.table_name, @reflection.klass.table_name, 'counts'].join('_')
 
-          if (@owner.class.detached_counter_cache_table_names || []).include?(potential_table_name)
-            row = connection.select_all("select count from `#{potential_table_name}` where #{@reflection.primary_key_name} = #{@owner.id}")[0]
+          if (@owner.class.detached_counter_cache_table_names || []).include?(potential_table_name) && @owner.id
+            row = connection.select_all("select count from #{potential_table_name} where #{@reflection.primary_key_name} = #{@owner.id}")[0]
             row.blank? ? 0 : row['count'].to_i
           else
             count_records_without_detached_counters
