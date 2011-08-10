@@ -1,5 +1,4 @@
-TEST_ROOT = File.dirname(__FILE__)
-require File.join(TEST_ROOT, 'test_helper')
+require 'test_helper'
 
 class DetachedCounterCacheTest < ActiveSupport::TestCase
   include ActiveRecord::TestFixtures

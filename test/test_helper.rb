@@ -4,7 +4,6 @@ require 'active_record'
 require 'active_record/fixtures'
 require 'mocha'
 require 'yaml'
-require 'ruby-debug'
 
 ActiveRecord::Base.configurations = YAML::load(File.open(File.join(File.dirname(__FILE__), 'database.yml')))
 ActiveRecord::Base.establish_connection(:detached_counter_cache_test)
@@ -37,7 +36,7 @@ ActiveRecord::Schema.define do
   add_index "users_wristbands_counts", 'user_id', :unique => true
 end
 
-require File.join(TEST_ROOT, '..', 'init')
+require 'init'
 
 class Test::Unit::TestCase
   def assert_same_elements enum1, enum2, *args
