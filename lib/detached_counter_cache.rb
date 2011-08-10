@@ -39,7 +39,7 @@ module ActiveRecordExtensions
           
           detached_counters.each do |placeholder, value|
             self.connection.execute(<<-SQL
-              INSERT INTO `#{placeholder.detached_counter_table_name}` (user_id, count) VALUES (#{id}, #{value})
+              INSERT INTO `#{placeholder.detached_counter_table_name}` (#{placeholder.reflection.primary_key_name}, count) VALUES (#{id}, #{value})
               ON DUPLICATE KEY UPDATE count = count + #{value}
             SQL
             )
